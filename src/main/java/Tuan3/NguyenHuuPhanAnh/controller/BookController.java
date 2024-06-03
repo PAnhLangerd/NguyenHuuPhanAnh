@@ -5,10 +5,7 @@ import Tuan3.NguyenHuuPhanAnh.services.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -35,6 +32,24 @@ public class BookController {
     public String addBook(@ModelAttribute("book") Book book) {
         if(bookService.getBookById(book.getId()).isEmpty())
             bookService.addBook(book);
+        return "redirect:/books";
+    }
+    @GetMapping("/edit/{id}")
+    public String editBookForm(@NotNull Model model, @PathVariable long id)
+    {
+        var book = bookService.getBookById(id).orElse(null);
+        model.addAttribute("book", book != null ? book : new Book());
+        return "book/edit";
+    }
+    @PostMapping("/edit")
+    public String editBook(@ModelAttribute("book") Book book) {
+        bookService.updateBook(book);
+        return "redirect:/books";
+    }
+    @GetMapping("/delete/{id}")
+    public String deleteBook(@PathVariable long id) {
+        if (bookService.getBookById(id).isPresent())
+            bookService.deleteBookById(id);
         return "redirect:/books";
     }
 }
