@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BookService {
-
     private final List<Book> books;
 
     public List<Book> getAllBooks() {
@@ -36,5 +36,15 @@ public class BookService {
     }
     public void deleteBookById(Long id) {
         getBookById(id).ifPresent(books::remove);
+    }
+
+    public List<Book> searchBooks(String keyword) {
+        if (keyword == null || keyword.isEmpty()) {
+            return books;
+        }
+        return books.stream()
+                .filter(book -> book.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
+                        book.getAuthor().toLowerCase().contains(keyword.toLowerCase()))
+                .collect(Collectors.toList());
     }
 }
